@@ -12,9 +12,10 @@ def fix_up_inflections(
             continue
         else:
             if delete_bad_parts_of_strings_with_spaces:
+
                 fixed_inflections.append(
                     remove_left_or_right_terms_from_inflection(
-                        remove_german_grammar_terms_from_inflection(inflections[i])
+                        remove_german_grammar_terms_from_inflection(inflections[i]))
                     )
                 )
             else:
@@ -87,21 +88,18 @@ GERMAN_GRAMMAR_PARTS = set(
         "čas minulý",
         "podmiňovací způsob",
         "způsob oznamovací",
-        "způsob rozkazovací",
+        "způsob rozkazovací"
     ]
 )
 
-REMOVE_FROM_LEFT = set(
-    [
+REMOVE_FROM_LEFT = [
         "byli by",
         "bylo by",
         "byla by",
         "byly by",
         "ste se",
         "se",
-        "chom se",
         "ses",
-        "ch se",
         "byl by ses",
         "byl by seste",
         "byl byste se",
@@ -112,14 +110,12 @@ REMOVE_FROM_LEFT = set(
         "budeme",
         "budete",
         "budou",
-        "ch",
         "sis" "si",
         "byl by sis",
         "ste si",
     ]
-)
-REMOVE_FROM_RIGHT = set(
-    [
+
+REMOVE_FROM_RIGHT = [
         "by",
         "byste",
         "bys",
@@ -136,25 +132,43 @@ REMOVE_FROM_RIGHT = set(
         "jste",
         "jsi",
         "jsem",
+        "sis",
+        "si",
+        "je si",
+
     ]
-)
+
+# Sort REMOVE_FROM_LEFT by number of words, descending
+REMOVE_FROM_LEFT.sort(key=lambda x: len(x.split(" ")), reverse=True)
+REMOVE_FROM_RIGHT.sort(key=lambda x: len(x.split(" ")), reverse=True)
 
 
 def remove_left_or_right_terms_from_inflection(inflection: str) -> str:
     """Removes undesired terms from the left or right of an inflection"""
+    inflection_parts = inflection.split(" ")
+
     for term in REMOVE_FROM_LEFT:
-        if len(term.split(" ")) >= len(inflection.split(" ")):
+        # Split term and inflection
+        term_parts = term.split(" ")
+        # Continue if term_parts is longer or equal than inflection_parts
+        if len(term_parts) >= len(inflection_parts):
             continue
-        # If inflection starts with the term, remove it
-        if inflection.startswith(term):
-            inflection = inflection.replace(term, "")
+        # Check if the first term_parts are equal to the first inflection_parts
+        if inflection_parts[: len(term_parts)] == term_parts:
+            # Remove the first term_parts from the inflection_parts
+            inflection_parts = inflection_parts[len(term_parts) :]
+            # Join the parts
+            inflection = " ".join(inflection_parts).strip()
+
     for term in REMOVE_FROM_RIGHT:
-        if len(term.split(" ")) >= len(inflection.split(" ")):
+        term_parts = term.split(" ")
+        if len(term_parts) >= len(inflection_parts):
             continue
-        # If inflection ends with the term, remove it
-        if inflection.endswith(term):
-            inflection = inflection.replace(term, "")
-    return inflection.strip()
+        if inflection_parts[-len(term_parts) :] == term_parts:
+            inflection_parts = inflection_parts[:-len(term_parts)]
+            inflection = " ".join(inflection_parts).strip()
+
+    return inflection
 
 
 def remove_german_grammar_terms_from_inflection(inflection_with_spaces: str) -> str:
@@ -186,7 +200,7 @@ def inflection_has_german_grammar_term(inflection: str) -> bool:
     )
 
 
-def fix_up_inflections_from_json(json_path):
+def fix_up_inflections_from_json(json_path, output_path):
     # Load the json file into a list of EntryData objects
     with open(json_path, "r", encoding="utf-8") as json_file:
         entries = json.load(json_file)
@@ -197,5 +211,5 @@ def fix_up_inflections_from_json(json_path):
             entry["inflections"], delete_bad_parts_of_strings_with_spaces=True
         )
     # Write the fixed up entries to a new json file
-    with open(json_path, "w", encoding="utf-8") as json_file:
+    with open(output_path, "w", encoding="utf-8") as json_file:
         json.dump(entries, json_file, indent=2, ensure_ascii=False)

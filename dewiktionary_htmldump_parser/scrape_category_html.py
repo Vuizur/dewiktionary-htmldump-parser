@@ -157,5 +157,5 @@ if __name__ == "__main__":
     #wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
     #wikt_scraper.start_download(False)
     #wikt_scraper.add_inflections_to_json("scraped_inflections.json")
-    fix_up_inflections_from_json("scraped_inflections.json")
+    fix_up_inflections_from_json("scraped_inflections.json", "fixed_up_inflections.json")
             
