@@ -131,25 +131,25 @@ class WiktionaryParser:
             if entry.word in entry.inflections:
                 entry.inflections.remove(entry.word)
 
+    @staticmethod
+    def inflection_is_empty(inflection: str) -> bool:
+        """Checks if an inflection is empty or has only punctuation"""
+        if inflection.strip() != "" and inflection != "\n" and inflection != "-" and inflection != "—":
+            return False
+        return True
+
     def _remove_empty_inflections(self):
         """Removes empty definitions"""
         for entry in self._entries:
             entry.inflections = [
                 inflection
                 for inflection in entry.inflections
-                if inflection.strip() != ""
-                and inflection != "\n"
-                and inflection != "-"
-                and inflection != "—"
+                if not self.inflection_is_empty(inflection)
             ]
-
-    def _remove_inflections_with_german_grammar_terms(self):
-        for entry in self._entries:
-            entry.inflections = [
-                inflection
-                for inflection in entry.inflections
-                if inflection
-                not in [
+            
+    @staticmethod
+    def inflection_has_german_grammar_term(inflection: str)->bool:
+        return inflection in [
                     "Aspekt",
                     "Präsens",
                     "1. Person Sg.",
@@ -170,8 +170,14 @@ class WiktionaryParser:
                     "Akkusativ",
                     "Lokativ",
                     "Instrumental",
-                ]
-                and "Alle weiteren Formen: " not in inflection
+                ] or "Alle weiteren Formen: " in inflection
+
+    def _remove_inflections_with_german_grammar_terms(self):
+        for entry in self._entries:
+            entry.inflections = [
+                inflection
+                for inflection in entry.inflections
+                if not self.inflection_has_german_grammar_term(inflection)
             ]
 
 

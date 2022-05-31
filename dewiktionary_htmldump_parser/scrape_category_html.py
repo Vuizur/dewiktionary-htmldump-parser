@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 import urllib.parse
 
-from dewiktionary_htmldump_parser.main import WiktionaryParser
+from dewiktionary_htmldump_parser.main import EntryData, WiktionaryParser
 
 BASE_DEWIKTIONARY_URL = "https://de.wiktionary.org/"
 
@@ -121,8 +121,14 @@ class WiktionaryScraper:
                 page_name = h1.get_text().split("Flexion:")[-1].strip()
                 # Get the table
                 table = soup.find("table", class_="wikitable")
+                # Create an empty EntryData object
+                entry_data = EntryData()
+                
                 # Use the WiktionaryParser to get the inflections
-                inflections = WiktionaryParser.get_inflections(table)
+                inflections = WiktionaryParser.extract_inflections_from_table(table)
+                if page_name in inflections:
+                    inflections.remove(page_name)
+                
 
             
 
