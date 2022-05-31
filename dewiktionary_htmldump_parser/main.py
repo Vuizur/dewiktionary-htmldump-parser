@@ -53,6 +53,15 @@ class WiktionaryParser:
                         self._remove_inflections_with_german_grammar_terms()
                         return
 
+    @staticmethod    
+    def extract_inflections_from_table(table):
+        """Extracts the inflections from a table"""
+        inflections = []
+        for row in table.find_all("tr"):
+            for cell in row.find_all("td"):
+                inflections.append(cell.text)
+        return inflections
+
     def _parse_entry(self, html: str) -> None:
         """Parses one entry and append it to the list of entries"""
 
@@ -77,11 +86,13 @@ class WiktionaryParser:
                             entry_data.type = subelement.text
                         # Get table
                         if subelement.name == "table":
-                            # Iterate through all rows in the table
-                            for row in subelement.find_all("tr"):
-                                # Iterate through all cells in the row
-                                for cell in row.find_all("td"):
-                                    entry_data.inflections.append(cell.text)
+                            inflections = self.extract_inflections_from_table(subelement)
+                            entry_data.inflections = inflections
+                            ## Iterate through all rows in the table
+                            #for row in subelement.find_all("tr"):
+                            #    # Iterate through all cells in the row
+                            #    for cell in row.find_all("td"):
+                            #        entry_data.inflections.append(cell.text)
                         # Get definitions
                         # Get the dl tag that follows after a p tag with the text "Bedeutungen:"
                         if subelement.name == "p" and "Bedeutungen:" in subelement.text:

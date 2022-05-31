@@ -1,2 +1,3 @@
 *Make usable for different languages
 *Find a way to parse these Flexion pages - how do I get them? -> Probably using Wiktextprocessor, which would have to be adapted to German (probably super difficult)
+*Add inflections from pages like https://de.wiktionary.org/wiki/absentizmus to other pages
