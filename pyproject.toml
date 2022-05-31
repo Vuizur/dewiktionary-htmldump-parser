@@ -8,7 +8,8 @@ version = "0.1.0"
 beautifulsoup4 = "*"
 lxml = "*"
 python = "^3.10"
-mwxml = "*"
+requests = "*"
+
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.3.0", allow-prereleases = true}
