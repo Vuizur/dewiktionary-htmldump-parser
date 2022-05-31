@@ -4,6 +4,8 @@ import json
 import os
 from bs4 import BeautifulSoup
 
+from dewiktionary_htmldump_parser.inflection_remover import inflection_has_german_grammar_term, inflection_is_empty
+
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -131,12 +133,6 @@ class WiktionaryParser:
             if entry.word in entry.inflections:
                 entry.inflections.remove(entry.word)
 
-    @staticmethod
-    def inflection_is_empty(inflection: str) -> bool:
-        """Checks if an inflection is empty or has only punctuation"""
-        if inflection.strip() != "" and inflection != "\n" and inflection != "-" and inflection != "—":
-            return False
-        return True
 
     def _remove_empty_inflections(self):
         """Removes empty definitions"""
@@ -144,40 +140,15 @@ class WiktionaryParser:
             entry.inflections = [
                 inflection
                 for inflection in entry.inflections
-                if not self.inflection_is_empty(inflection)
+                if not inflection_is_empty(inflection)
             ]
-            
-    @staticmethod
-    def inflection_has_german_grammar_term(inflection: str)->bool:
-        return inflection in [
-                    "Aspekt",
-                    "Präsens",
-                    "1. Person Sg.",
-                    "2. Person Sg.",
-                    "3. Person Sg.",
-                    "1. Person Pl.",
-                    "2. Person Pl.",
-                    "3. Person Pl.",
-                    "Präteritum",
-                    "m",
-                    "f",
-                    "Partizip Perfekt",
-                    "Partizip Passiv",
-                    "Imperativ Singular",
-                    "Nominativ",
-                    "Genitiv",
-                    "Dativ",
-                    "Akkusativ",
-                    "Lokativ",
-                    "Instrumental",
-                ] or "Alle weiteren Formen: " in inflection
 
     def _remove_inflections_with_german_grammar_terms(self):
         for entry in self._entries:
             entry.inflections = [
                 inflection
                 for inflection in entry.inflections
-                if not self.inflection_has_german_grammar_term(inflection)
+                if not inflection_has_german_grammar_term(inflection)
             ]
 
 

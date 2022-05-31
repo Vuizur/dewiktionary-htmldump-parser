@@ -4,3 +4,4 @@ dewiktionary_htmldump_parser/__pycache__/*
 adjektiv_deklination_tschechisch.txt
 czech_flexion_page_urls.txt
 html_files/*
+scraped_inflections.json

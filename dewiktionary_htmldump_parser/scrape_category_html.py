@@ -1,11 +1,13 @@
+import json
 import os
 import random
 import time
 from bs4 import BeautifulSoup
 import requests
 import urllib.parse
+from dewiktionary_htmldump_parser.inflection_remover import fix_up_inflections_from_json
 
-from dewiktionary_htmldump_parser.main import EntryData, WiktionaryParser
+from dewiktionary_htmldump_parser.main import EnhancedJSONEncoder, EntryData, WiktionaryParser
 
 BASE_DEWIKTIONARY_URL = "https://de.wiktionary.org/"
 
@@ -109,31 +111,51 @@ class WiktionaryScraper:
 
     def add_inflections_to_json(self, json_path: str)-> None:
         
+        # Create EntryData list
+        entry_data_list = []
+
         # Iterates over all the html files in the html_files folder
         for html_file_path in os.listdir(self.output_html_folder):
+
             # Open the html file
-            with open(html_file_path, "r", encoding="utf-8") as f:
+            with open(self.output_html_folder + "/" + html_file_path, "r", encoding="utf-8") as f:
                 # Parse the html
                 soup = BeautifulSoup(f.read(), "lxml")
                 # Get the h1 tag with the id "firstHeading"
                 h1 = soup.find("h1", id="firstHeading")
+                if h1 == None:
+                    print("No h1 tag with id \"firstHeading\" found in", html_file_path)
+                    continue
+
                 # Get the inner html, with the string "Flexion:" removed from the left
                 page_name = h1.get_text().split("Flexion:")[-1].strip()
                 # Get the table
                 table = soup.find("table", class_="wikitable")
                 # Create an empty EntryData object
                 entry_data = EntryData()
+                entry_data.word = page_name
                 
                 # Use the WiktionaryParser to get the inflections
                 inflections = WiktionaryParser.extract_inflections_from_table(table)
                 if page_name in inflections:
                     inflections.remove(page_name)
-                
+                # Add the inflections to the EntryData object
+                entry_data.inflections = inflections
+                # Add the EntryData object to the list
+                entry_data_list.append(entry_data)
+
+                # Print something all 100 iterations
+                if len(entry_data_list) % 100 == 0:
+                    print(len(entry_data_list))
+
+        # Write the EntryData list to the json file
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(entry_data_list, f, indent=4, ensure_ascii=False, cls=EnhancedJSONEncoder)
 
             
-
 if __name__ == "__main__":
-    wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
-    wikt_scraper.start_download(False)
-    
+    #wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
+    #wikt_scraper.start_download(False)
+    #wikt_scraper.add_inflections_to_json("scraped_inflections.json")
+    fix_up_inflections_from_json("scraped_inflections.json")
             
