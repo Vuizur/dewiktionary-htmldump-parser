@@ -7,6 +7,8 @@ import requests
 import urllib.parse
 from dewiktionary_htmldump_parser.inflection_remover import fix_up_inflections_from_json
 
+#NOTE: Scraping Wiktionary by downloading the pages is generally not a good idea, but 
+
 from dewiktionary_htmldump_parser.main import EnhancedJSONEncoder, EntryData, WiktionaryParser
 
 BASE_DEWIKTIONARY_URL = "https://de.wiktionary.org/"
@@ -136,7 +138,7 @@ class WiktionaryScraper:
                 entry_data.word = page_name
                 
                 # Use the WiktionaryParser to get the inflections
-                inflections = WiktionaryParser.extract_inflections_from_table(table)
+                inflections = WiktionaryParser.extract_inflections_from_flexion_table(table)
                 if page_name in inflections:
                     inflections.remove(page_name)
                 # Add the inflections to the EntryData object
@@ -154,8 +156,8 @@ class WiktionaryScraper:
 
             
 if __name__ == "__main__":
-    #wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
+    wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
     #wikt_scraper.start_download(False)
-    #wikt_scraper.add_inflections_to_json("scraped_inflections.json")
-    fix_up_inflections_from_json("scraped_inflections.json", "fixed_up_inflections.json")
+    wikt_scraper.add_inflections_to_json("scraped_inflections.json")
+    #fix_up_inflections_from_json("scraped_inflections.json", "fixed_up_inflections.json")
             

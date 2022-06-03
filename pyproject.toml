@@ -14,6 +14,7 @@ requests = "*"
 black = {version = "^22.3.0", allow-prereleases = true}
 mypy = "*"
 pytest = "^5.2"
+types-requests = "*"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

@@ -8,16 +8,15 @@ def fix_up_inflections(
     fixed_inflections = []
 
     for i in range(len(inflections)):
-        if inflection_is_undesired(inflections[i]):
+        if inflection_is_empty(inflections[i]):
             continue
         else:
             if delete_bad_parts_of_strings_with_spaces:
 
                 fixed_inflections.append(
-                    remove_left_or_right_terms_from_inflection(
-                        remove_german_grammar_terms_from_inflection(inflections[i]))
-                    )
+                    remove_left_or_right_terms_from_inflection(inflections[i])
                 )
+
             else:
                 fixed_inflections.append(inflections[i].strip())
     return fixed_inflections
@@ -88,55 +87,54 @@ GERMAN_GRAMMAR_PARTS = set(
         "čas minulý",
         "podmiňovací způsob",
         "způsob oznamovací",
-        "způsob rozkazovací"
+        "způsob rozkazovací",
     ]
 )
 
 REMOVE_FROM_LEFT = [
-        "byli by",
-        "bylo by",
-        "byla by",
-        "byly by",
-        "ste se",
-        "se",
-        "ses",
-        "byl by ses",
-        "byl by seste",
-        "byl byste se",
-        "byl by se",
-        "budu",
-        "budeš",
-        "bude",
-        "budeme",
-        "budete",
-        "budou",
-        "sis" "si",
-        "byl by sis",
-        "ste si",
-    ]
+    "byli by",
+    "bylo by",
+    "byla by",
+    "byly by",
+    "ste se",
+    "se",
+    "ses",
+    "byl by ses",
+    "byl by seste",
+    "byl byste se",
+    "byl by se",
+    "budu",
+    "budeš",
+    "bude",
+    "budeme",
+    "budete",
+    "budou",
+    "sis" "si",
+    "byl by sis",
+    "ste si",
+]
 
 REMOVE_FROM_RIGHT = [
-        "by",
-        "byste",
-        "bys",
-        "se",
-        "(se)",
-        "by ses",
-        "bych",
-        "byste",
-        "bychom",
-        "bychte",
-        "bychme",
-        "byl by se",
-        "jsme",
-        "jste",
-        "jsi",
-        "jsem",
-        "sis",
-        "si",
-        "je si",
-
-    ]
+    "by",
+    "byste",
+    "bys",
+    "se",
+    "(se)",
+    "by ses",
+    "bych",
+    "byste",
+    "bychom",
+    "bychte",
+    "bychme",
+    "byl by se",
+    "jsme",
+    "jste",
+    "jsi",
+    "jsem",
+    "sis",
+    "si",
+    "je si",
+]
 
 # Sort REMOVE_FROM_LEFT by number of words, descending
 REMOVE_FROM_LEFT.sort(key=lambda x: len(x.split(" ")), reverse=True)
@@ -165,39 +163,15 @@ def remove_left_or_right_terms_from_inflection(inflection: str) -> str:
         if len(term_parts) >= len(inflection_parts):
             continue
         if inflection_parts[-len(term_parts) :] == term_parts:
-            inflection_parts = inflection_parts[:-len(term_parts)]
+            inflection_parts = inflection_parts[: -len(term_parts)]
             inflection = " ".join(inflection_parts).strip()
 
     return inflection
 
 
-def remove_german_grammar_terms_from_inflection(inflection_with_spaces: str) -> str:
-    # Split the inflection into its parts
-    inflection_parts = inflection_with_spaces.split(" ")
-    # Remove the parts that are german grammar terms
-    inflection_parts = [
-        part for part in inflection_parts if not part in GERMAN_GRAMMAR_PARTS
-    ]
-    # Join the parts
-    return " ".join(inflection_parts).strip()
-
-
-def inflection_is_undesired(inflection: str) -> bool:
-    return inflection_is_empty(inflection) or inflection_has_german_grammar_term(
-        inflection
-    )
-
-
 def inflection_is_empty(inflection: str) -> bool:
     """Checks if an inflection is empty or has only punctuation"""
     return inflection.strip() in ["", "\n", "-", "—"]
-
-
-def inflection_has_german_grammar_term(inflection: str) -> bool:
-    return (
-        inflection.strip() in GERMAN_GRAMMAR_PARTS
-        or "Alle weiteren Formen: " in inflection
-    )
 
 
 def fix_up_inflections_from_json(json_path, output_path):

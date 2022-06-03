@@ -6,3 +6,4 @@ czech_flexion_page_urls.txt
 html_files/*
 scraped_inflections.json
 fixed_up_inflections.json
+scraped_inflections_old.json

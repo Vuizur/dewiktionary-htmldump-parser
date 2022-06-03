@@ -58,10 +58,21 @@ class WiktionaryParser:
     @staticmethod    
     def extract_inflections_from_table(table):
         """Extracts the inflections from a table"""
+        #TODO: Check this
         inflections = []
         for row in table.find_all("tr"):
             for cell in row.find_all("td"):
-                inflections.append(cell.text)
+                    inflections.append(cell.text)
+        return inflections
+    @staticmethod    
+    def extract_inflections_from_flexion_table(table):
+        """Extracts the inflections from a table - Applicable for the Flexion namespace"""
+        inflections = []
+        for row in table.find_all("tr"):
+            if not row.has_attr("class"):
+                for cell in row.find_all("td"):
+                    if not cell.has_attr("class") and (not cell.has_attr("style") or "background" not in cell["style"]):
+                        inflections.append(cell.text)
         return inflections
 
     def _parse_entry(self, html: str) -> None:
@@ -90,11 +101,7 @@ class WiktionaryParser:
                         if subelement.name == "table":
                             inflections = self.extract_inflections_from_table(subelement)
                             entry_data.inflections = inflections
-                            ## Iterate through all rows in the table
-                            #for row in subelement.find_all("tr"):
-                            #    # Iterate through all cells in the row
-                            #    for cell in row.find_all("td"):
-                            #        entry_data.inflections.append(cell.text)
+                            
                         # Get definitions
                         # Get the dl tag that follows after a p tag with the text "Bedeutungen:"
                         if subelement.name == "p" and "Bedeutungen:" in subelement.text:
