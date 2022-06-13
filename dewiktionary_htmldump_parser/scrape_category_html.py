@@ -46,7 +46,7 @@ class WiktionaryScraper:
         # Return the links to the pages in the category
         return page_urls
 
-    def _print_all_urls_to_file(urls: list[str], output_file_path: str) -> None:
+    def _print_all_urls_to_file(self, urls: list[str], output_file_path: str) -> None:
         """Prints all urls to a file"""
         with open(output_file_path, "w", encoding="utf-8") as f:
             for url in urls:
@@ -75,6 +75,7 @@ class WiktionaryScraper:
         page_name = url.split("/")[-1]
         page_name = WiktionaryScraper._sanitize_url_to_filename(page_name)
         print(page_name)
+        return page_name
 
     def _download_html_for_page_url(self, url: str) -> None:
         """Downloads the html for a page url and writes it to a html file,
@@ -156,8 +157,8 @@ class WiktionaryScraper:
 
             
 if __name__ == "__main__":
-    wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
+#    wikt_scraper = WiktionaryScraper("czech_flexion_page_urls.txt", "czech_flexion_page_urls.txt")
     #wikt_scraper.start_download(False)
-    wikt_scraper.add_inflections_to_json("scraped_inflections.json")
-    #fix_up_inflections_from_json("scraped_inflections.json", "fixed_up_inflections.json")
+#    wikt_scraper.add_inflections_to_json("scraped_inflections.json")
+    fix_up_inflections_from_json("scraped_inflections.json", "fixed_up_inflections.json")
             

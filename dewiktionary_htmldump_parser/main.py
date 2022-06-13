@@ -43,27 +43,33 @@ class WiktionaryParser:
                     obj = json.loads(line)
                     name = obj["name"]
                     html = obj["article_body"]["html"]
+
+                    # if word is equal to "vyhovovat", print html to file
+                    #if name == "vyhovovat":
+                    #    with open("vyhovovat.html", "w", encoding="utf-8") as f:
+                    #        f.write(html)
+
                     self._parse_entry(html)
 
                     # Print the number of iterations every 10000 iterations
                     i += 1
-                    if i % 1000 == 0:
+                    if i % 2000 == 0:
                         print(i)
                         # TODO: Move
-                        self._remove_inflections_with_same_word()
-                        self._remove_empty_inflections()
-                        self._remove_inflections_with_german_grammar_terms()
-                        return
+                self._remove_inflections_with_same_word()
+                self._remove_empty_inflections()
+                self._remove_inflections_with_german_grammar_terms()
+                        
 
-    @staticmethod    
-    def extract_inflections_from_table(table):
-        """Extracts the inflections from a table"""
-        #TODO: Check this
-        inflections = []
-        for row in table.find_all("tr"):
-            for cell in row.find_all("td"):
-                    inflections.append(cell.text)
-        return inflections
+    #@staticmethod    
+    #def extract_inflections_from_table(table):
+    #    """Extracts the inflections from a table"""
+    #    #TODO: Check this
+    #    inflections = []
+    #    for row in table.find_all("tr"):
+    #        for cell in row.find_all("td"):
+    #                inflections.append(cell.text)
+    #    return inflections
     @staticmethod    
     def extract_inflections_from_flexion_table(table):
         """Extracts the inflections from a table - Applicable for the Flexion namespace"""
@@ -89,7 +95,7 @@ class WiktionaryParser:
                     # Parse the word
                     entry_data = EntryData()
                     entry_data.word = self._parse_word(section.h2)
-                    print(entry_data.word)
+                    #print(entry_data.word)
                     # Iterate through the siblings of the h2 (This should be the another section, and in theory only one)
                     # sibling = section.h2.next_sibling
                     sibling = section.section
@@ -97,14 +103,14 @@ class WiktionaryParser:
                     for subelement in sibling.children:
                         if subelement.name == "h3":
                             entry_data.type = subelement.text
-                        # Get table
-                        if subelement.name == "table":
-                            inflections = self.extract_inflections_from_table(subelement)
+                        # Get table that has the class inflection-table
+                        elif subelement.name == "table" and subelement.has_attr("class") and "inflection-table" in subelement["class"]:
+                            inflections = self.extract_inflections_from_flexion_table(subelement)
                             entry_data.inflections = inflections
                             
                         # Get definitions
                         # Get the dl tag that follows after a p tag with the text "Bedeutungen:"
-                        if subelement.name == "p" and "Bedeutungen:" in subelement.text:
+                        elif subelement.name == "p" and "Bedeutungen:" in subelement.text:
                             # Get the next sibling
                             definition_list = subelement.find_next_sibling("dl")
 
@@ -132,7 +138,7 @@ class WiktionaryParser:
         # Get the id attribute of the bs4 h2 tag
         id_attr = h2["id"]
         # Return id_attr up to the first underscore
-        return id_attr.split("_")[0]
+        return id_attr.split("_(")[0].replace("_", " ")
 
     def _remove_inflections_with_same_word(self):
         """Removes inflections that are the same as the word"""

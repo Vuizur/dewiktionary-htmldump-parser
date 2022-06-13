@@ -2,3 +2,4 @@
 *Add inflections from pages like https://de.wiktionary.org/wiki/absentizmus to other pages
 *Fix the bug that appears because I tried to find compound words in a split string
 *Check if the same method as for the flexion namespace can be used for the main one (table extraction)
+*Skip all entries in the inflection table that contain a href that contains "Hilfe:"
