@@ -11,10 +11,16 @@ def fix_up_inflections(
     for i in range(len(inflections)):
         # No-break-spaces are always annoying
         inflections[i] = inflections[i].replace("\u00a0", " ")
+
         if inflection_is_empty(inflections[i]):
             continue
         else:
             if delete_bad_parts_of_strings_with_spaces:
+                # If the inflection contains a comma, split it into multiple inflections
+                if "," in inflections[i]:
+                    multiple_infls = inflections[i].split(",")
+                    for inflection in multiple_infls:
+                        fixed_inflections.append(remove_unnecessary_inflection_parts(inflection.strip()))
 
                 fixed_inflections.append(
                     remove_unnecessary_inflection_parts(inflections[i]).strip()
@@ -22,6 +28,10 @@ def fix_up_inflections(
 
             else:
                 fixed_inflections.append(inflections[i].strip())
+                if "," in inflections[i]:
+                    multiple_infls = inflections[i].split(",")
+                    for inflection in multiple_infls:
+                        fixed_inflections.append(inflection.strip())
     #Remove duplicates
     fixed_inflections = list(set(fixed_inflections))
 

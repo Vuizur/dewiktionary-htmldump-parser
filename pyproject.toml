@@ -9,6 +9,7 @@ beautifulsoup4 = "*"
 lxml = "*"
 python = "^3.10"
 requests = "*"
+pyglossary = "*"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.3.0", allow-prereleases = true}
