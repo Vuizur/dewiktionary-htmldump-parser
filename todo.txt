@@ -3,3 +3,7 @@
 *Fix the bug that appears because I tried to find compound words in a split string
 *Check if the same method as for the flexion namespace can be used for the main one (table extraction)
 *Skip all entries in the inflection table that contain a href that contains "Hilfe:"
+*Parse https://de.wiktionary.org/wiki/Flexion:ten
+*Promote auf Teestube
+*pripravovat se -> \n in der Definition -> Entfernen
+*Einträge wie jak parsen, die zwei Etymologien haben

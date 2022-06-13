@@ -16,8 +16,7 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
-#TODO: Finish
-def generate_dictionary(json_with_definitions_path = "json_output.json", json_with_inflections_path = "fixed_up_inflections.json"):
+def generate_dictionary(json_with_definitions_path = "json_output_new.json", json_with_inflections_path = "fixed_up_inflections.json"):
     with open(json_with_definitions_path, "r", encoding="utf-8") as json_file:
         definition_data = json.load(json_file)
     with open(json_with_inflections_path, "r", encoding="utf-8") as inflections_file:

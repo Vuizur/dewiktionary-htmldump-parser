@@ -1,8 +1,8 @@
 # De-Wiktionary HTML dump parser
 
-This project parses the German Wiktionary HTML dump (right now to extract Czech-German data) into JSON that can easily be used in any application. 
+This project parses the German Wiktionary HTML dump (right now only to extract Czech-German data) into JSON that can easily be used in any application. 
 
-Besides using the the HTML dump it also scrapes some pages, because the Flexion namespace in the German Wiktionary is not included the HTML dump
+Besides using the the HTML dump it also scrapes some pages, because the Flexion namespace in the German Wiktionary is not included the HTML dump (hopefully this will change), it has some code to also scrape them. 
 
 
 ### Comparison with other projects

@@ -60,6 +60,7 @@ class WiktionaryParser:
                 self._remove_empty_inflections()
                 self._remove_inflections_with_german_grammar_terms()
                         
+                        
 
     #@staticmethod    
     #def extract_inflections_from_table(table):
@@ -81,6 +82,34 @@ class WiktionaryParser:
                         inflections.append(cell.text)
         return inflections
 
+    def _get_section_entry_data(self, section, word) -> EntryData:
+        entry_data = EntryData(word)
+        # Iterate through all subelements of the sibling
+        for subelement in section.children:
+            if subelement.name == "h3":
+                entry_data.type = subelement.text
+            # Get table that has the class inflection-table
+            elif subelement.name == "table" and subelement.has_attr("class") and "inflection-table" in subelement["class"]:
+                inflections = self.extract_inflections_from_flexion_table(subelement)
+                entry_data.inflections = inflections
+                
+            # Get definitions
+            # Get the dl tag that follows after a p tag with the text "Bedeutungen:"
+            elif subelement.name == "p" and "Bedeutungen:" in subelement.text:
+                # Get the next sibling
+                definition_list = subelement.find_next_sibling("dl")
+                if definition_list != None:
+                    for definition_line in definition_list.children:
+                        if definition_line.name == "dd":
+                            entry_data.definitions.append(
+                                definition_line.text
+                            )
+                else:
+                    print(entry_data.word)
+                    print("Error: Definition not found")
+        return entry_data
+
+
     def _parse_entry(self, html: str) -> None:
         """Parses one entry and append it to the list of entries"""
 
@@ -93,37 +122,17 @@ class WiktionaryParser:
 
                 if f"({self._language.capitalize()})" in section.h2.text:
                     # Parse the word
-                    entry_data = EntryData()
-                    entry_data.word = self._parse_word(section.h2)
+                    #entry_data = EntryData()
+                    word = self._parse_word(section.h2)
                     #print(entry_data.word)
                     # Iterate through the siblings of the h2 (This should be the another section, and in theory only one)
-                    # sibling = section.h2.next_sibling
-                    sibling = section.section
-                    # Iterate through all subelements of the sibling
-                    for subelement in sibling.children:
-                        if subelement.name == "h3":
-                            entry_data.type = subelement.text
-                        # Get table that has the class inflection-table
-                        elif subelement.name == "table" and subelement.has_attr("class") and "inflection-table" in subelement["class"]:
-                            inflections = self.extract_inflections_from_flexion_table(subelement)
-                            entry_data.inflections = inflections
-                            
-                        # Get definitions
-                        # Get the dl tag that follows after a p tag with the text "Bedeutungen:"
-                        elif subelement.name == "p" and "Bedeutungen:" in subelement.text:
-                            # Get the next sibling
-                            definition_list = subelement.find_next_sibling("dl")
-
-                            if definition_list != None:
-                                for definition_line in definition_list.children:
-                                    if definition_line.name == "dd":
-                                        entry_data.definitions.append(
-                                            definition_line.text
-                                        )
-                            else:
-                                print(entry_data.word)
-                                print("Error: Definition not found")
-                    self._entries.append(entry_data)
+                    #for sibling in section.h2.find_all("section", recursive=False):
+                    for sibling in section.contents:
+                        if sibling.name == "section":
+                            self._entries.append(self._get_section_entry_data(sibling, word))
+                    #Old code
+                    #sibling = section.section
+                    
 
     def generate_json(self, output_file_path: str) -> None:
         """Generates a JSON file with the parsed entries"""
@@ -169,4 +178,4 @@ if __name__ == "__main__":
     WIKTIONARY_DUMP_FOLDER_PATH = "D:/dewiktionary-NS0-20220520-ENTERPRISE-HTML"
     wikt_parser = WiktionaryParser(WIKTIONARY_DUMP_FOLDER_PATH, "Tschechisch")
     wikt_parser.parse()
-    wikt_parser.generate_json("json_output.json")
+    wikt_parser.generate_json("json_output_new.json")
